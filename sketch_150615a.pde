@@ -54,19 +54,27 @@ void mouseClicked(){
     if(so.isType(Controller.POTI)){
       Poti controller = ((WaveGen)so).getController();
       if(controller.contains(mouseX, mouseY)){
-        ((WaveGen)so).switchTypes();
+        if(mouseButton==LEFT){
+          ((WaveGen)so).switchTypes();
+        }else if(mouseButton == RIGHT){
+          controller.toggleExtensions();
+        }
       }
     }
   }
 }
 
 void mouseDragged(){
-  for(SoundObject so : waveArray){
-    if(so.isType(Controller.POTI)){
-      Poti controller = ((WaveGen)so).getController();
-      if(controller.contains(mouseX, mouseY)){
-        controller.move(mouseX, mouseY);
-        ((WaveGen)so).setFrequency(degrees( controller.getEncodedValue())*(720/360));
+  if(mouseButton==LEFT){
+    for(SoundObject so : waveArray){
+      if(so.isType(Controller.POTI)){
+        Poti controller = ((WaveGen)so).getController();
+        if(controller.contains(mouseX, mouseY)){
+          controller.rotateTo(mouseX, mouseY);
+          ((WaveGen)so).setFrequency(degrees( controller.getEncodedValue())*(720/360));
+        }else if(controller.containsMover(mouseX, mouseY)){
+          controller.move(mouseX, mouseY);
+        }
       }
     }
   }
