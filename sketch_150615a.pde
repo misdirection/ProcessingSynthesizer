@@ -7,7 +7,7 @@ import ddf.minim.effects.*;
 
 Minim minim;
 AudioOutput out;
-SoundObject[] waveArray; 
+WaveGen[] waveArray; 
 int outScale = 1;
 
 void setup(){  //noLoop();
@@ -15,7 +15,7 @@ void setup(){  //noLoop();
   
   minim = new Minim(this);
   out = minim.getLineOut();
-  waveArray = new SoundObject[]{new WaveGen(out, 100, 100, 0)};
+  waveArray = new WaveGen[]{new WaveGen(out, 100, 100, 0)};
 }
   
 
@@ -24,11 +24,20 @@ void draw(){
   stroke(255);
   strokeWeight(1);
    
-  for(SoundObject so : waveArray){
+  for(WaveGen so : waveArray){
     so.draw();
   }
   // draw the waveform of the output
   drawOutWave(25);
+  drawMenu();
+}
+
+void drawMenu(){
+  imageMode(CENTER); 
+  pushMatrix();
+  translate(50, 25);
+  image(loadImage("wave.png"), 0, 0, 25, 25);
+  popMatrix(); 
 }
 
 void drawOutWave(int sizeValue){
@@ -36,7 +45,10 @@ void drawOutWave(int sizeValue){
   int xoffset = 0;
   while(repeat){
     for(int i = 0; i < out.bufferSize() - outScale; i = i + outScale){
-      line( xoffset + i/outScale, sizeValue  - out.left.get(i)*sizeValue,  xoffset + i/outScale+1, sizeValue  - out.left.get(i+outScale)*sizeValue );
+      line( xoffset + i/outScale, 
+        25 + sizeValue  - out.left.get(i)*sizeValue,  
+        xoffset + i/outScale+1, 
+        25 + sizeValue  - out.left.get(i+outScale)*sizeValue );
     }
     line( xoffset + (out.bufferSize() - outScale-1)/outScale+1, 
       sizeValue  - out.left.get((out.bufferSize() - outScale-1)+outScale)*sizeValue,  
@@ -50,9 +62,10 @@ void mousePressed(){
   
 }
 void mouseClicked(){
-  for(SoundObject so : waveArray){
+  checkMenuItemClick(mouseX, mouseY);
+  for(WaveGen so : waveArray){
     if(so.isType(Controller.TYPE_POTI)){
-      Poti controller = ((WaveGen)so).getController();
+      Poti controller = so.getController();
       if(controller.containsAmpSelect(mouseX, mouseY)){
         controller.setType(Controller.TYPE_AMP);
       }else if (controller.containsFreqSelect(mouseX, mouseY)){
@@ -68,18 +81,24 @@ void mouseClicked(){
   }
 }
 
+void checkMenuItemClick(int x, int y){
+  // Item1 - make new Oscil
+    if(x <= 50+25/2 && 
+      x >= 50-25/2 &&
+      y <= 25+25/2 && y >= 25-25/2)
+      waveArray = (WaveGen[])append(waveArray, new WaveGen(out, 100, 100, waveArray.length));
+}
+
 void mouseDragged(){
   if(mouseButton==LEFT){
-    for(SoundObject so : waveArray){
-      if(so.isType(Controller.TYPE_POTI)){
-        Poti controller = ((WaveGen)so).getController();
-        if(controller.contains(mouseX, mouseY)){
-          controller.rotateTo(mouseX, mouseY);
-          if(controller.isFrequencyController()) ((WaveGen)so).setFrequency(degrees( controller.getEncodedValue())*(720/360));
-          else ((WaveGen)so).setAmplitude(degrees( controller.getEncodedValue()/360));
-        }else if(controller.containsMover(mouseX, mouseY)){
-          controller.move(mouseX, mouseY);
-        }
+    for(WaveGen so : waveArray){
+      Poti controller = so.getController();
+      if(controller.contains(mouseX, mouseY)){
+        controller.rotateTo(mouseX, mouseY);
+        if(controller.isFrequencyController()) so.setFrequency(degrees( controller.getEncodedValue())*(720/360));
+        else so.setAmplitude(degrees( controller.getEncodedValue()/360));
+      }else if(controller.containsMover(mouseX, mouseY)){
+        controller.move(mouseX, mouseY);
       }
     }
   }
@@ -99,13 +118,15 @@ void mouseMoved(){
 }
 
 void keyPressed(){ 
-   //waveArray = (SoundObject[])append(waveArray, new WaveGen(out, mouseX, mouseY, waveArray.length));
    switch(key){
      case 'w':
        outScale += 1;
      break;
      case 's': 
        if(outScale>1) outScale -= 1;
+     break;
+     case '+': 
+       //waveArray = (WaveGen[])append(waveArray, new WaveGen(out, mouseX, mouseY, waveArray.length));
      break;
    }
 }

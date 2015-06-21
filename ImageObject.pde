@@ -9,7 +9,7 @@ class Poti extends Controller{
   PImage img, lable, mover, ampSelect, freqSelect;
   float mRotation;
   int mPositionX = 0, mPositionY = 0;
-  boolean isExtended = false;
+  boolean isExtended = true;
    
   Poti(int x, int y, PImage l){
     img = loadImage("poti.png");
@@ -50,19 +50,19 @@ class Poti extends Controller{
   }
   
   boolean containsMover(int x, int y){
-    if(x <= mPositionX+75 && 
-      x >= mPositionX+25 &&
-      y <= mPositionY+75 && 
-      y >= mPositionY+25 &&
+    if(x <= mPositionX+50+25/2 && 
+      x >= mPositionX+50-25/2 &&
+      y >= mPositionY+50-25/2 && 
+      y <= mPositionY+50+25/2 &&
       isExtended) return true;
       else return false;
   }
     
   boolean containsAmpSelect(int x, int y){
-    if(x <= mPositionX-25 && 
-      x >= mPositionX-75 &&
-      y <= mPositionY-25 && 
-      y >= mPositionY-75 &&
+    if(x <= mPositionX-50+25/2 && 
+      x >= mPositionX-50-25/2 &&
+      y <= mPositionY-50+25/2 && 
+      y >= mPositionY-50-25/2 &&
       isExtended) {
         println("hit amp");
         return true;
@@ -71,10 +71,10 @@ class Poti extends Controller{
   }
     
   boolean containsFreqSelect(int x, int y){
-    if(x <= mPositionX-50 && 
-      x >= mPositionX-100 &&
-      y <= mPositionY+25 && 
-      y >= mPositionY-25 &&
+    if(x <= mPositionX-25-25/2 && 
+      x >= mPositionX-75-25/2 &&
+      y <= mPositionY+25/2 && 
+      y >= mPositionY-25/2 &&
       isExtended) {
         println("hit freq");
         return true;
