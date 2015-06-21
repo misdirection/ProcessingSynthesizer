@@ -16,22 +16,16 @@ class WaveGen extends SoundObject{
     mWave.patch(out);
   }
   
-  void setAmplitude(float amplitude){
-    mWave.setAmplitude( amplitude );
-  }  
-  void setFrequency(float freqency){
-    mWave.setFrequency( freqency );
-  }
-  void setWaveform(Wavetable wave){
-    mWave.setWaveform(wave);
-  }
+  void setAmplitude(float amplitude){ mWave.setAmplitude( amplitude ); }  
+  void setFrequency(float freqency){ mWave.setFrequency( freqency ); }
+  void setWaveform(Wavetable wave){ mWave.setWaveform(wave); }
+  Poti getController(){ return controller; }
   void patch(AudioOutput out, AudioOutput out2){
     mWave.unpatch(out);
     mWave.patch(out2);
   }
   
-  Poti getController(){ return controller;   }
-  boolean isType(String s){ return s.equalsIgnoreCase(Controller.POTI); }
+  boolean isType(String s){ return s.equalsIgnoreCase(Controller.TYPE_POTI); }
   
   void switchTypes(){
     waveType = (waveType+1)%5;

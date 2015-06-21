@@ -51,9 +51,13 @@ void mousePressed(){
 }
 void mouseClicked(){
   for(SoundObject so : waveArray){
-    if(so.isType(Controller.POTI)){
+    if(so.isType(Controller.TYPE_POTI)){
       Poti controller = ((WaveGen)so).getController();
-      if(controller.contains(mouseX, mouseY)){
+      if(controller.containsAmpSelect(mouseX, mouseY)){
+        controller.setType(Controller.TYPE_AMP);
+      }else if (controller.containsFreqSelect(mouseX, mouseY)){
+        controller.setType(Controller.TYPE_FREQ);
+      }else if(controller.contains(mouseX, mouseY)){
         if(mouseButton==LEFT){
           ((WaveGen)so).switchTypes();
         }else if(mouseButton == RIGHT){
@@ -67,11 +71,12 @@ void mouseClicked(){
 void mouseDragged(){
   if(mouseButton==LEFT){
     for(SoundObject so : waveArray){
-      if(so.isType(Controller.POTI)){
+      if(so.isType(Controller.TYPE_POTI)){
         Poti controller = ((WaveGen)so).getController();
         if(controller.contains(mouseX, mouseY)){
           controller.rotateTo(mouseX, mouseY);
-          ((WaveGen)so).setFrequency(degrees( controller.getEncodedValue())*(720/360));
+          if(controller.isFrequencyController()) ((WaveGen)so).setFrequency(degrees( controller.getEncodedValue())*(720/360));
+          else ((WaveGen)so).setAmplitude(degrees( controller.getEncodedValue()/360));
         }else if(controller.containsMover(mouseX, mouseY)){
           controller.move(mouseX, mouseY);
         }
