@@ -8,13 +8,14 @@ import ddf.minim.effects.*;
 Minim minim;
 AudioOutput out;
 SoundObject[] waveArray; 
+int outScale = 1;
 
 void setup(){  //noLoop();
   size(800, 800);
   
   minim = new Minim(this);
   out = minim.getLineOut();
-  waveArray = new SoundObject[]{new WaveGen(out, Waves.SINE, 0)};
+  waveArray = new SoundObject[]{new WaveGen(out, 100, 100, 0)};
 }
   
 
@@ -31,20 +32,28 @@ void draw(){
 }
 
 void drawOutWave(int sizeValue){
-  for(int i = 0; i < out.bufferSize() - 1; i++){
-    line( i, sizeValue  - out.left.get(i)*sizeValue,  i+1, sizeValue  - out.left.get(i+1)*sizeValue );
+  boolean repeat = true;
+  int xoffset = 0;
+  while(repeat){
+    for(int i = 0; i < out.bufferSize() - outScale; i = i + outScale){
+      line( xoffset + i/outScale, sizeValue  - out.left.get(i)*sizeValue,  xoffset + i/outScale+1, sizeValue  - out.left.get(i+outScale)*sizeValue );
+    }
+    line( xoffset + (out.bufferSize() - outScale-1)/outScale+1, 
+      sizeValue  - out.left.get((out.bufferSize() - outScale-1)+outScale)*sizeValue,  
+      xoffset + (out.bufferSize() - outScale-1)/outScale+2, 
+      sizeValue  - out.left.get((0)+outScale)*sizeValue );
+    repeat = (out.bufferSize() / outScale + xoffset < getWidth());
+    xoffset += out.bufferSize() / outScale;
   }
 }
 void mousePressed(){
   
 }
 void mouseClicked(){
-  ImageObject[] controllerArray;
   for(SoundObject so : waveArray){
-    // BoundingBox um zu testen ob das schon zu diesem Object gehört --> Komplexität
-    controllerArray = so.getController();
-    for(ImageObject controller : controllerArray){
-      if(controller.contains(mouseX, mouseY) && controller.type.equalsIgnoreCase("Poti")){
+    if(so.isType(Controller.POTI)){
+      Poti controller = ((WaveGen)so).getController();
+      if(controller.contains(mouseX, mouseY)){
         ((WaveGen)so).switchTypes();
       }
     }
@@ -52,11 +61,9 @@ void mouseClicked(){
 }
 
 void mouseDragged(){
-  ImageObject[] controllerArray;
   for(SoundObject so : waveArray){
-    // BoundingBox um zu testen ob das schon zu diesem Object gehört --> Komplexität
-    controllerArray = so.getController();
-    for(ImageObject controller : controllerArray){
+    if(so.isType(Controller.POTI)){
+      Poti controller = ((WaveGen)so).getController();
       if(controller.contains(mouseX, mouseY)){
         controller.move(mouseX, mouseY);
         ((WaveGen)so).setFrequency(degrees( controller.getEncodedValue())*(720/360));
@@ -79,6 +86,14 @@ void mouseMoved(){
 }
 
 void keyPressed(){ 
-   waveArray = (SoundObject[])append(waveArray, new WaveGen(out, Waves.SINE, waveArray.length));
+   //waveArray = (SoundObject[])append(waveArray, new WaveGen(out, mouseX, mouseY, waveArray.length));
+   switch(key){
+     case 'w':
+       outScale += 1;
+     break;
+     case 's': 
+       if(outScale>1) outScale -= 1;
+     break;
+   }
 }
 

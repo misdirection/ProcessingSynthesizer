@@ -1,16 +1,17 @@
 abstract class SoundObject{
-abstract void draw();
-abstract ImageObject[] getController();
+  abstract void draw();
+  abstract boolean isType(String s);
+  abstract void patch(AudioOutput out, AudioOutput out2);
 }
 
 class WaveGen extends SoundObject{
   private Oscil mWave;
   private int mIndex, waveType = 0;
-  private ImageObject[] controller = new ImageObject[0];
+  private Poti controller;
   
-  WaveGen(AudioOutput out, Wavetable wave, int index){
+  WaveGen(AudioOutput out, int x, int y, int index){
     mIndex = index;
-    controller = (ImageObject[])append(controller, new Poti(index));
+    controller = new Poti(x, y, loadImage("sin.png"));
     mWave = new Oscil( 0, 0.5f, Waves.SINE );
     mWave.patch(out);
   }
@@ -24,47 +25,47 @@ class WaveGen extends SoundObject{
   void setWaveform(Wavetable wave){
     mWave.setWaveform(wave);
   }
-  
-  ImageObject[] getController(){
-    return controller;
+  void patch(AudioOutput out, AudioOutput out2){
+    mWave.unpatch(out);
+    mWave.patch(out2);
   }
+  
+  Poti getController(){ return controller;   }
+  boolean isType(String s){ return s.equalsIgnoreCase(Controller.POTI); }
   
   void switchTypes(){
     waveType = (waveType+1)%5;
-    println(waveType);
     switch(waveType){
    
     case 0:
       setWaveform(Waves.SINE);
+      controller.setLabel(loadImage("sin.png"));
       break;
       
     case 1: 
-      setWaveform(Waves.TRIANGLE);  
+      setWaveform(Waves.TRIANGLE);
+      controller.setLabel(loadImage("triangle.png"));  
       break;
  
     case 2:
       setWaveform(Waves.SAW);
+      controller.setLabel(loadImage("saw.png"));
       break;
  
     case 3:
       setWaveform(Waves.SQUARE);
+      controller.setLabel(loadImage("square.png"));
       break;
  
     case 4:
       setWaveform(Waves.QUARTERPULSE);
+      controller.setLabel(loadImage("quarter.png"));
       break;
     default: break; 
-    }
-    for(ImageObject img : controller){
-      if(img.type.equalsIgnoreCase("Poti")){
-        ((Poti)img).setWaveType(waveType);
-      }
     }
   }
   
   void draw(){
-    for(int i = 0; i < controller.length; ++i){
-      controller[i].draw();
-    }
+      controller.draw();
   } 
 }  

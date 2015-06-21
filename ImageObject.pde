@@ -1,30 +1,26 @@
-abstract class ImageObject{
-  int mIndex, alignHorizontal;
-  String type = "";
-  abstract void draw();
-  abstract boolean contains(int x, int y);
-  abstract void move(int x, int y);
-  abstract float getEncodedValue();
+abstract class Controller{
+  public static final String POTI = "POTI";
 }
 
-class Poti extends ImageObject{
+class Poti extends Controller{
   PImage img; 
   PImage lable;
   float mRotation;
+  int mPositionX = 0;
+  int mPositionY = 0;
    
-  Poti(int index){
+  Poti(int x, int y, PImage l){
     img = loadImage("poti.png");
-    mIndex = index; 
-    alignHorizontal = (mIndex+1)*110;  
+    mPositionX = x;
+    mPositionY = y;
     mRotation = 0;
-    type = "Poti";
-    lable = loadImage("sin.png");
+    lable = l;
   }
   
   void draw(){
     imageMode(CENTER); 
     pushMatrix();
-    translate(alignHorizontal, height-50);
+    translate(mPositionX, mPositionY);
     pushMatrix();
     rotate(mRotation);
     image(img, 0, 0, 100, 100);
@@ -36,41 +32,19 @@ class Poti extends ImageObject{
     return mRotation;
   }
   boolean contains(int x, int y){
-    if(x <= alignHorizontal+50 && 
-      x >= alignHorizontal-50 &&
-      y < height && y > height-100) return true;
+    if(x <= mPositionX+50 && 
+      x >= mPositionX-50 &&
+      y <= mPositionY+50 && y >= mPositionY-50) return true;
       else return false;
   }
   void move(int x, int y){
     PVector a = new PVector(0, -1);
-    PVector b = new PVector(alignHorizontal - x, height-50 - y);
-    if(x > alignHorizontal) mRotation = PI-PVector.angleBetween(a,b);
+    PVector b = new PVector(mPositionX - x, mPositionY - y);
+    if(x > mPositionX) mRotation = PI-PVector.angleBetween(a,b);
     else mRotation = PI + PVector.angleBetween(a,b);
   }
   
-  void setWaveType(int waveType){
-    switch(waveType){
-   
-    case 0:
-      lable = loadImage("sin.png");
-      break;
-      
-    case 1: 
-      lable = loadImage("triangle.png"); 
-      break;
- 
-    case 2:
-      lable = loadImage("saw.png");
-      break;
- 
-    case 3:
-      lable = loadImage("square.png");
-      break;
- 
-    case 4:
-      lable = loadImage("quarter.png");
-      break;
-    default: break; 
-    }
+  void setLabel(PImage l){
+    lable = l;
   }
 }
