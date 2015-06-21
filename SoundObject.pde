@@ -8,6 +8,7 @@ class WaveGen extends SoundObject{
   private Oscil mWave;
   private int mIndex, waveType = 0;
   private Poti controller;
+  private 
   
   WaveGen(AudioOutput out, int x, int y, int index){
     mIndex = index;

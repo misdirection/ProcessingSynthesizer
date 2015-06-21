@@ -11,7 +11,7 @@ WaveGen[] waveArray;
 int outScale = 1;
 
 void setup(){  //noLoop();
-  size(800, 800);
+  size(1280, 800);
   
   minim = new Minim(this);
   out = minim.getLineOut();
@@ -124,9 +124,6 @@ void keyPressed(){
      break;
      case 's': 
        if(outScale>1) outScale -= 1;
-     break;
-     case '+': 
-       //waveArray = (WaveGen[])append(waveArray, new WaveGen(out, mouseX, mouseY, waveArray.length));
      break;
    }
 }
