@@ -8,7 +8,7 @@ import ddf.minim.effects.*;
 Minim minim;
 AudioOutput out;
 ArrayList<Poti> controllerArray;
-int outScale = 1;
+int outScale = 1, pressedConnectorID = 0;
 
 void setup(){  //noLoop();
   size(1280, 800);
@@ -42,8 +42,15 @@ void drawMenu(){
   pushMatrix();
   translate(getWidth()/2,100);
   image(loadImage("patchIn.png"), 0, 0, 50, 50);
-  popMatrix(); 
-  
+  popMatrix();  
+}
+
+boolean audioOutContains(int x, int y){
+  if(x <= getWidth()/2+25 && 
+      x >= getWidth()/2-25  &&
+      y <= 125 && 
+      y >= 75)return true;
+      else return false;
 }
 
 void drawOutWave(int sizeValue){
@@ -65,19 +72,33 @@ void drawOutWave(int sizeValue){
   }
 }
 void mousePressed(){
-  
+  for(Poti controller : controllerArray){
+    if(controller.containsPatchOut(mouseX, mouseY)){
+      pressedConnectorID = controller.getOutID();
+      return;
+    }
+  }
 }
 
 void mouseReleased(){
-
+  if(pressedConnectorID>0 && audioOutContains(mouseX, mouseY)){    
+    for(Poti controller : controllerArray){
+      if(controller.getOutID() == pressedConnectorID){
+        controller.patch();
+        pressedConnectorID = 0;
+        return;
+      }
+    }
+  }
+  pressedConnectorID = 0;
 }
 void mouseClicked(){
   checkMenuItemClick(mouseX, mouseY);
   for(Poti controller : controllerArray){
     controller.containsFreqPatchIn(mouseX, mouseY);
     controller.containsAmpPatchIn(mouseX, mouseY);
-    controller.containsPatchOut(mouseX, mouseY);
     if(controller.containsRemove(mouseX, mouseY)){
+      controller.unpatch();
       controllerArray.remove(controller);
       return;
     }else if(controller.containsMenu(mouseX, mouseY)){
@@ -109,7 +130,12 @@ void checkMenuItemClick(int x, int y){
 }
 
 void mouseDragged(){
+  int lineStartX=mouseX, lineStartY=mouseY;
   for(Poti controller : controllerArray){
+    if(controller.getOutID() == pressedConnectorID){
+      lineStartX = controller.mPositionX+((int)(Controller.SIZE_IMG*1.5));
+      lineStartY = controller.mPositionY;
+    }
     if(controller.contains(mouseX, mouseY)){        
       if(controller.isExtended){
         controller.rotateTo(mouseX, mouseY);
@@ -119,6 +145,7 @@ void mouseDragged(){
       return;
     }
   }
+  line(lineStartX, lineStartY, mouseX, mouseY);
 }
 
 

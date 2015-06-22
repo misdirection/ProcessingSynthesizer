@@ -1,19 +1,21 @@
-abstract class Controller{
+static class Controller{
   public static final String TYPE_POTI = "POTI";
   public static final String TYPE_AMP = "AMP";
   public static final String TYPE_FREQ = "FREQ";
   
   public static final int MAX_FREQUENCY = 720;
   public static final int SIZE_IMG = 50;
+  
+  public static int ObjectID = 1;
 }
 
 class Poti extends Controller{
   String type = Controller.TYPE_FREQ;
-  PImage img, lable, menu, ampSelect, freqSelect, remove, patchIn, patchOut;
-  float mRotation;
-  int mPositionX = 0, mPositionY = 0, waveType = 0;
-  boolean isExtended = false;
-  SoundObject mSoundObject = null;
+  private PImage img, lable, menu, ampSelect, freqSelect, remove, patchIn, patchOut;
+  private float mRotation;
+  private int mPositionX = 0, mPositionY = 0, waveType = 0, freqInID, ampInID, outID;
+  private boolean isExtended = false;
+  private SoundObject mSoundObject = null;
    
   Poti(int x, int y, SoundObject so){
     mSoundObject = so;
@@ -28,6 +30,12 @@ class Poti extends Controller{
     mPositionX = x;
     mPositionY = y;
     mRotation = 0;
+    freqInID = Controller.ObjectID;
+    Controller.ObjectID++;
+    ampInID = Controller.ObjectID;
+    Controller.ObjectID++;
+    outID = Controller.ObjectID;
+    Controller.ObjectID++;
   }
   
   void draw(){
@@ -80,7 +88,7 @@ class Poti extends Controller{
       x >= mPositionX-Controller.SIZE_IMG*1.75 &&
       y <= mPositionY-Controller.SIZE_IMG*0.75 && 
       y >= mPositionY-Controller.SIZE_IMG*1.25 &&
-      isExtended) { println("hit AmpPatchIn");
+      isExtended) { //println(getAmpInID());
         return true;
       }else return false;
   }
@@ -99,7 +107,7 @@ class Poti extends Controller{
       x >= mPositionX-(Controller.SIZE_IMG*2.25) &&
       y <= mPositionY+(Controller.SIZE_IMG*0.25) && 
       y >= mPositionY-(Controller.SIZE_IMG*0.25) &&
-      isExtended) { println("hit FreqPatchIn");
+      isExtended) { //println(getFreqInID());
         return true;
       }else return false;
   }
@@ -109,7 +117,7 @@ class Poti extends Controller{
       x >= mPositionX+(Controller.SIZE_IMG*0.75) &&
       y <= mPositionY+(Controller.SIZE_IMG*0.25) && 
       y >= mPositionY-(Controller.SIZE_IMG*0.25) &&
-      isExtended) { println("hit PatchOut");
+      isExtended) { //println(getOutID());
         return true;
       }else return false;
   }
@@ -151,6 +159,9 @@ class Poti extends Controller{
   
   boolean isFrequencyController(){ return type.equalsIgnoreCase(Controller.TYPE_FREQ);}
   boolean isAmplitudeController(){ return type.equalsIgnoreCase(Controller.TYPE_AMP);}
+  int getFreqInID(){ return freqInID; }
+  int getAmpInID(){ return ampInID; }
+  int getOutID(){ return outID; }
 
   void switchTypes(){
     waveType = (waveType+1)%5;
@@ -182,6 +193,8 @@ class Poti extends Controller{
       default: break; 
     }
   }
+  void patch(){ mSoundObject.patch(); }
+  void unpatch(){ mSoundObject.unpatch(); }
 }
 
 
