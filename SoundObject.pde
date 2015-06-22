@@ -26,7 +26,7 @@ class WaveGen extends SoundObject{
   float getAmplitude(){ return maxAmp; };
   float getFrequency(){ return freq; };
   void patch(){
-    try{ mWave.unpatch(audioOutput);
+    try{ unpatch();
     }catch(Exception e){}
     mWave.patch(audioOutput);
   }

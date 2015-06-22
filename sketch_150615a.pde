@@ -7,7 +7,9 @@ import ddf.minim.effects.*;
 
 Minim minim;
 AudioOutput out;
-ArrayList<Poti> controllerArray;
+ArrayList<Poti> controllerArray = new ArrayList<Poti>();
+ArrayList<Line> lineArray = new ArrayList<Line>();
+Line pressedConnectorLine = null;
 int outScale = 1, pressedConnectorID = 0;
 
 void setup(){  //noLoop();
@@ -15,7 +17,6 @@ void setup(){  //noLoop();
   
   minim = new Minim(this);
   out = minim.getLineOut();
-  controllerArray = new ArrayList<Poti>();
   controllerArray.add(new Poti(100, 100, new WaveGen(out)));
 }
   
@@ -31,6 +32,9 @@ void draw(){
   // draw the waveform of the output
   drawOutWave(25);
   drawMenu();
+  for(Line l : lineArray){
+    l.draw();
+  }
 }
 
 void drawMenu(){
@@ -63,10 +67,6 @@ void drawOutWave(int sizeValue){
         xoffset + i/outScale+1, 
         25 + sizeValue  - out.left.get(i+outScale)*sizeValue );
     }
-    line( xoffset + (out.bufferSize() - outScale-1)/outScale+1, 
-      sizeValue  - out.left.get((out.bufferSize() - outScale-1)+outScale)*sizeValue,  
-      xoffset + (out.bufferSize() - outScale-1)/outScale+2, 
-      sizeValue  - out.left.get((0)+outScale)*sizeValue );
     repeat = (out.bufferSize() / outScale + xoffset < getWidth());
     xoffset += out.bufferSize() / outScale;
   }
@@ -75,6 +75,9 @@ void mousePressed(){
   for(Poti controller : controllerArray){
     if(controller.containsPatchOut(mouseX, mouseY)){
       pressedConnectorID = controller.getOutID();
+      pressedConnectorLine = new Line(controller.getOutID(), 0, 
+          (int)(controller.mPositionX+(Controller.SIZE_IMG*1.5)), controller.mPositionY, 
+          mouseX, mouseY);
       return;
     }
   }
@@ -86,6 +89,7 @@ void mouseReleased(){
       if(controller.getOutID() == pressedConnectorID){
         controller.patch();
         pressedConnectorID = 0;
+        lineArray.add(pressedConnectorLine);
         return;
       }
     }
@@ -99,7 +103,14 @@ void mouseClicked(){
     controller.containsAmpPatchIn(mouseX, mouseY);
     if(controller.containsRemove(mouseX, mouseY)){
       controller.unpatch();
+      int id = controller.getOutID();
       controllerArray.remove(controller);
+      for(Line l : lineArray){
+        if(l.fromID == id) {
+          lineArray.remove(l);
+          return;
+        }
+      }
       return;
     }else if(controller.containsMenu(mouseX, mouseY)){
       controller.toggleExtensions();
@@ -130,36 +141,31 @@ void checkMenuItemClick(int x, int y){
 }
 
 void mouseDragged(){
-  int lineStartX=mouseX, lineStartY=mouseY;
   for(Poti controller : controllerArray){
     if(controller.getOutID() == pressedConnectorID){
-      lineStartX = controller.mPositionX+((int)(Controller.SIZE_IMG*1.5));
-      lineStartY = controller.mPositionY;
+      pressedConnectorLine.toX = mouseX;
+      pressedConnectorLine.toY = mouseY;
+      pressedConnectorLine.draw();
     }
     if(controller.contains(mouseX, mouseY)){        
       if(controller.isExtended){
         controller.rotateTo(mouseX, mouseY);
       }else if(!controller.isExtended){
         controller.move(mouseX, mouseY);
+        for(Line l : lineArray){
+          if(l.fromID == controller.getOutID()){
+            l.fromX = (int)(controller.mPositionX+(Controller.SIZE_IMG*1.5));
+            l.fromY = controller.mPositionY;
+          }
+        }
       }
       return;
     }
   }
-  line(lineStartX, lineStartY, mouseX, mouseY);
 }
 
 
-void mouseMoved(){
- /*
-  float amp = map( mouseY, 0, height, 1, 0 );
-  wave.setAmplitude( amp );
- 
-  float freq = map( mouseX, 0, width, 110, 880 );
-  wave.setFrequency( freq );
-  
-  redraw();
-  */
-}
+void mouseMoved(){}
 
 void keyPressed(){ 
    switch(key){
@@ -170,5 +176,22 @@ void keyPressed(){
        if(outScale>1) outScale -= 1;
      break;
    }
+}
+
+class Line{
+  int fromID, toID, fromX,  toX, fromY,  toY;
+  
+  Line(int fromID, int toID, int fromX, int fromY, int toX, int toY){
+    this.fromID = fromID;
+    this.toID = toID; 
+    this.fromX = fromX;  
+    this.toX = toX;
+    this.fromY = fromY;  
+    this.toY = toY;
+  }
+  
+  void draw(){
+    line(fromX, fromY, toX, toY);
+  }
 }
 
