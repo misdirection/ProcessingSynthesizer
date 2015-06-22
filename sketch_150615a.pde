@@ -84,48 +84,56 @@ void mousePressed(){
 }
 
 void mouseReleased(){
-  if(pressedConnectorID>0 && audioOutContains(mouseX, mouseY)){    
-    for(Poti controller : controllerArray){
-      if(controller.getOutID() == pressedConnectorID){
-        controller.patch();
-        pressedConnectorID = 0;
-        lineArray.add(pressedConnectorLine);
-        return;
+     
+  for(Poti controller : controllerArray){
+    if(controller.getOutID() == pressedConnectorID && audioOutContains(mouseX, mouseY)){ 
+      controller.getSoundObject().patch(out);
+      pressedConnectorID = 0;
+      lineArray.add(pressedConnectorLine);
+      return;
+    }else{ 
+      for(Poti controller2 : controllerArray){
+        if(controller.getOutID() == pressedConnectorID && controller2.containsFreqPatchIn(mouseX, mouseY)){  
+          controller.getSoundObject().patch(controller2.getSoundObject().getUGen());
+          pressedConnectorID = 0;
+          pressedConnectorLine.toID = controller2.getFreqInID();
+          lineArray.add(pressedConnectorLine);
+          return;
+        }
       }
     }
   }
   pressedConnectorID = 0;
 }
+
 void mouseClicked(){
   checkMenuItemClick(mouseX, mouseY);
-  for(Poti controller : controllerArray){
-    controller.containsFreqPatchIn(mouseX, mouseY);
-    controller.containsAmpPatchIn(mouseX, mouseY);
-    if(controller.containsRemove(mouseX, mouseY)){
-      controller.unpatch();
-      int id = controller.getOutID();
-      controllerArray.remove(controller);
+  for(int i = 0; i < controllerArray.size(); ++i){
+    controllerArray.get(i).containsFreqPatchIn(mouseX, mouseY);
+    if(controllerArray.get(i).containsRemove(mouseX, mouseY)){
+      controllerArray.get(i).unpatch();
+      ArrayList<Line> newLineArray = new ArrayList<Line>();
       for(Line l : lineArray){
-        if(l.fromID == id) {
-          lineArray.remove(l);
-          return;
+        if(!(l.fromID == controllerArray.get(i).getOutID()) && !(l.toID == controllerArray.get(i).getFreqInID())) {
+          newLineArray.add(l);
         }
       }
+      lineArray = newLineArray;
+      controllerArray.remove(i);
+    }else if(controllerArray.get(i).containsMenu(mouseX, mouseY)){
+      controllerArray.get(i).toggleExtensions();
       return;
-    }else if(controller.containsMenu(mouseX, mouseY)){
-      controller.toggleExtensions();
+    }else if(controllerArray.get(i).containsAmpSelect(mouseX, mouseY)){
+      controllerArray.get(i).setType(Controller.TYPE_AMP);
       return;
-    }else if(controller.containsAmpSelect(mouseX, mouseY)){
-      controller.setType(Controller.TYPE_AMP);
+    }else if (controllerArray.get(i).containsFreqSelect(mouseX, mouseY)){
+      controllerArray.get(i).setType(Controller.TYPE_FREQ);
       return;
-    }else if (controller.containsFreqSelect(mouseX, mouseY)){
-      controller.setType(Controller.TYPE_FREQ);
-      return;
-    }else if(controller.contains(mouseX, mouseY)){
+    }else if(controllerArray.get(i).contains(mouseX, mouseY)){
       if(mouseButton==LEFT){
-        controller.switchTypes();
+        controllerArray.get(i).switchTypes();
       }else if(mouseButton == RIGHT){
-        controller.toggleExtensions();
+        controllerArray.get(i).toggleExtensions();
       }
       return;
     }

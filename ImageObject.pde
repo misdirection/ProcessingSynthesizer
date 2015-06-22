@@ -13,7 +13,7 @@ class Poti extends Controller{
   String type = Controller.TYPE_FREQ;
   private PImage img, lable, menu, ampSelect, freqSelect, remove, patchIn, patchOut;
   private float mRotation;
-  private int mPositionX = 0, mPositionY = 0, waveType = 0, freqInID, ampInID, outID;
+  private int mPositionX = 0, mPositionY = 0, waveType = 0, freqInID, outID;
   private boolean isExtended = false;
   private SoundObject mSoundObject = null;
    
@@ -31,8 +31,6 @@ class Poti extends Controller{
     mPositionY = y;
     mRotation = 0;
     freqInID = Controller.ObjectID;
-    Controller.ObjectID++;
-    ampInID = Controller.ObjectID;
     Controller.ObjectID++;
     outID = Controller.ObjectID;
     Controller.ObjectID++;
@@ -52,7 +50,6 @@ class Poti extends Controller{
       image(ampSelect, -Controller.SIZE_IMG, -Controller.SIZE_IMG, Controller.SIZE_IMG/2, Controller.SIZE_IMG/2); 
       image(freqSelect, -(Controller.SIZE_IMG*1.5), 0, Controller.SIZE_IMG/2, Controller.SIZE_IMG/2); 
       image(remove, Controller.SIZE_IMG*0.75, -Controller.SIZE_IMG*0.75, Controller.SIZE_IMG/2, Controller.SIZE_IMG/2);
-      image(patchIn, -Controller.SIZE_IMG* 1.5, -Controller.SIZE_IMG , Controller.SIZE_IMG/2, Controller.SIZE_IMG/2); // amp Patch In
       image(patchIn, -(Controller.SIZE_IMG*2), 0 , Controller.SIZE_IMG/2, Controller.SIZE_IMG/2 ); // freq patch in
       image(patchOut, (Controller.SIZE_IMG*1.5), 0 , Controller.SIZE_IMG/2, Controller.SIZE_IMG/2 );
     }
@@ -80,16 +77,6 @@ class Poti extends Controller{
       y <= mPositionY-Controller.SIZE_IMG*0.75 && 
       y >= mPositionY-Controller.SIZE_IMG*1.25 &&
       isExtended) { return true;
-      }else return false;
-  }
-  
-  boolean containsAmpPatchIn(int x, int y){
-    if(x <= mPositionX-Controller.SIZE_IMG*1.25 && 
-      x >= mPositionX-Controller.SIZE_IMG*1.75 &&
-      y <= mPositionY-Controller.SIZE_IMG*0.75 && 
-      y >= mPositionY-Controller.SIZE_IMG*1.25 &&
-      isExtended) { //println(getAmpInID());
-        return true;
       }else return false;
   }
     
@@ -160,7 +147,6 @@ class Poti extends Controller{
   boolean isFrequencyController(){ return type.equalsIgnoreCase(Controller.TYPE_FREQ);}
   boolean isAmplitudeController(){ return type.equalsIgnoreCase(Controller.TYPE_AMP);}
   int getFreqInID(){ return freqInID; }
-  int getAmpInID(){ return ampInID; }
   int getOutID(){ return outID; }
 
   void switchTypes(){

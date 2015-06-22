@@ -1,7 +1,10 @@
 abstract class SoundObject{
   abstract boolean isType(String s);
   abstract void patch();
+  abstract void patch(AudioOutput out);
+  abstract void patch(UGen ugen);
   abstract void unpatch();
+  abstract UGen getUGen();
 }
 
 class WaveGen extends SoundObject{
@@ -25,17 +28,27 @@ class WaveGen extends SoundObject{
   void setWaveform(Wavetable wave){ mWave.setWaveform(wave); }
   float getAmplitude(){ return maxAmp; };
   float getFrequency(){ return freq; };
+  UGen getUGen(){ return mWave; }
+  void patch(UGen ugen){ mWave.patch(((Oscil)ugen).frequency); this.patchOut = ugen; }
+  void patch(AudioOutput out){ unpatchFromOut(); mWave.patch(out); this.audioOutput = out;}
   void patch(){
-    try{ unpatch();
-    }catch(Exception e){}
+    unpatch();  
     mWave.patch(audioOutput);
   }
   void unpatch(){
-    try{ 
-      mWave.unpatch(audioOutput);
+    try{ mWave.unpatch(audioOutput);
     }catch(Exception e){}
-    try{ 
-      mWave.unpatch(patchOut);
+    try{ mWave.unpatch(patchOut);
+    }catch(Exception e){}
+  }
+  
+  void unpatchFromOut(){
+    try{ mWave.unpatch(audioOutput);
+    }catch(Exception e){}
+  }
+    
+  void unpatchFromUGen(UGen ugen){
+    try{ mWave.unpatch(ugen);
     }catch(Exception e){}
   }
   
