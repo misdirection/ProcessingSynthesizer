@@ -2,9 +2,9 @@ abstract class SoundObject{
   abstract boolean isType(String s);
   abstract void patch();
   abstract void patch(AudioOutput out);
-  abstract void patch(UGen ugen);
+ // abstract void patch(UGen ugen);
   abstract void unpatch();
-  abstract UGen getUGen();
+ // abstract UGen getUGen();
 }
 
 class WaveGen extends SoundObject{
@@ -15,7 +15,7 @@ class WaveGen extends SoundObject{
   private UGen patchOut = null;
   
   WaveGen(AudioOutput out){
-    maxAmp = 0.5;
+    maxAmp = 2;
     mWave = new Oscil( 0, maxAmp, Waves.SINE );
     audioOutput = out;
   }
@@ -28,8 +28,8 @@ class WaveGen extends SoundObject{
   void setWaveform(Wavetable wave){ mWave.setWaveform(wave); }
   float getAmplitude(){ return maxAmp; };
   float getFrequency(){ return freq; };
-  UGen getUGen(){ return mWave; }
-  void patch(UGen ugen){ mWave.patch(((Oscil)ugen).frequency); this.patchOut = ugen; }
+  Oscil getOscil(){return mWave; }
+  void patch(UGen.UGenInput ugen){ mWave.patch(ugen); }
   void patch(AudioOutput out){ unpatchFromOut(); mWave.patch(out); this.audioOutput = out;}
   void patch(){
     unpatch();  

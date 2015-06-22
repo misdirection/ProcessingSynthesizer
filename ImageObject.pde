@@ -3,7 +3,7 @@ static class Controller{
   public static final String TYPE_AMP = "AMP";
   public static final String TYPE_FREQ = "FREQ";
   
-  public static final int MAX_FREQUENCY = 720;
+  public static final int MAX_FREQUENCY = 360;
   public static final int SIZE_IMG = 50;
   
   public static int ObjectID = 1;
@@ -125,7 +125,7 @@ class Poti extends Controller{
     else mRotation = PI + PVector.angleBetween(a,b);
     
     if(isFrequencyController()) ((WaveGen)mSoundObject).setFrequency(degrees( mRotation*(Controller.MAX_FREQUENCY/360)));
-    else if(isAmplitudeController()) ((WaveGen)mSoundObject).setAmplitude(degrees( mRotation/360)); 
+    else if(isAmplitudeController()) ((WaveGen)mSoundObject).setAmplitude(degrees( mRotation/120)); 
   }
   
   void move(int x, int y){  
@@ -136,7 +136,7 @@ class Poti extends Controller{
   void setLabel(PImage l){ lable = l; }
   void setType(String s){ 
     this.type = s; 
-    if(s.equalsIgnoreCase(Controller.TYPE_AMP)) mRotation = radians(((WaveGen)mSoundObject).getAmplitude()*360);
+    if(s.equalsIgnoreCase(Controller.TYPE_AMP)) mRotation = radians(((WaveGen)mSoundObject).getAmplitude()*120);
     else if(s.equalsIgnoreCase(Controller.TYPE_FREQ)) mRotation = radians(((WaveGen)mSoundObject).getFrequency()/(Controller.MAX_FREQUENCY/360));
   }
   void toggleExtensions(){ isExtended = !isExtended; }

@@ -94,7 +94,8 @@ void mouseReleased(){
     }else{ 
       for(Poti controller2 : controllerArray){
         if(controller.getOutID() == pressedConnectorID && controller2.containsFreqPatchIn(mouseX, mouseY)){  
-          controller.getSoundObject().patch(controller2.getSoundObject().getUGen());
+          
+          ((WaveGen)controller.getSoundObject()).getOscil().patch(((WaveGen)controller2.getSoundObject()).getOscil().frequency);
           pressedConnectorID = 0;
           pressedConnectorLine.toID = controller2.getFreqInID();
           lineArray.add(pressedConnectorLine);
