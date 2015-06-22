@@ -9,7 +9,7 @@ abstract class Controller{
 
 class Poti extends Controller{
   String type = Controller.TYPE_FREQ;
-  PImage img, lable, menu, ampSelect, freqSelect;
+  PImage img, lable, menu, ampSelect, freqSelect, remove, patchIn, patchOut;
   float mRotation;
   int mPositionX = 0, mPositionY = 0, waveType = 0;
   boolean isExtended = false;
@@ -22,6 +22,9 @@ class Poti extends Controller{
     ampSelect = loadImage("ampSelect.png");
     freqSelect = loadImage("freqSelect.png");
     lable = loadImage("sin.png");
+    remove = loadImage("close.png");
+    patchIn = loadImage("patchIn.png");
+    patchOut = loadImage("patchOut.png");
     mPositionX = x;
     mPositionY = y;
     mRotation = 0;
@@ -40,46 +43,84 @@ class Poti extends Controller{
     if(isExtended){
       image(ampSelect, -Controller.SIZE_IMG, -Controller.SIZE_IMG, Controller.SIZE_IMG/2, Controller.SIZE_IMG/2); 
       image(freqSelect, -(Controller.SIZE_IMG*1.5), 0, Controller.SIZE_IMG/2, Controller.SIZE_IMG/2); 
+      image(remove, Controller.SIZE_IMG*0.75, -Controller.SIZE_IMG*0.75, Controller.SIZE_IMG/2, Controller.SIZE_IMG/2);
+      image(patchIn, -Controller.SIZE_IMG* 1.5, -Controller.SIZE_IMG , Controller.SIZE_IMG/2, Controller.SIZE_IMG/2); // amp Patch In
+      image(patchIn, -(Controller.SIZE_IMG*2), 0 , Controller.SIZE_IMG/2, Controller.SIZE_IMG/2 ); // freq patch in
+      image(patchOut, (Controller.SIZE_IMG*1.5), 0 , Controller.SIZE_IMG/2, Controller.SIZE_IMG/2 );
     }
     popMatrix(); 
   }
   boolean contains(int x, int y){
     if(x <= mPositionX+Controller.SIZE_IMG && 
       x >= mPositionX-Controller.SIZE_IMG &&
-      y <= mPositionY+Controller.SIZE_IMG && y >= mPositionY-Controller.SIZE_IMG) return true;
+      y <= mPositionY+Controller.SIZE_IMG && 
+      y >= mPositionY-Controller.SIZE_IMG) return true;
       else return false;
   }
   
   boolean containsMenu(int x, int y){
-    if(x <= mPositionX+(Controller.SIZE_IMG*0.75)+(Controller.SIZE_IMG/4) && 
-      x >= mPositionX+(Controller.SIZE_IMG*0.75)-(Controller.SIZE_IMG/4) &&
-      y >= mPositionY+(Controller.SIZE_IMG*0.75)-(Controller.SIZE_IMG/4) && 
-      y <= mPositionY+(Controller.SIZE_IMG*0.75)+(Controller.SIZE_IMG/4)) return true;
+    if(x <= mPositionX+Controller.SIZE_IMG && 
+      x >= mPositionX+(Controller.SIZE_IMG*0.5) &&
+      y >= mPositionY+(Controller.SIZE_IMG*0.5) && 
+      y <= mPositionY+(Controller.SIZE_IMG)) return true;
       else return false;
   }
     
   boolean containsAmpSelect(int x, int y){
-    if(x <= mPositionX-Controller.SIZE_IMG+(Controller.SIZE_IMG/4) && 
-      x >= mPositionX-Controller.SIZE_IMG-(Controller.SIZE_IMG/4) &&
-      y <= mPositionY-Controller.SIZE_IMG+(Controller.SIZE_IMG/4) && 
-      y >= mPositionY-Controller.SIZE_IMG-(Controller.SIZE_IMG/4) &&
-      isExtended) {
-        println("hit amp");
+    if(x <= mPositionX-Controller.SIZE_IMG*0.75 && 
+      x >= mPositionX-Controller.SIZE_IMG*1.25 &&
+      y <= mPositionY-Controller.SIZE_IMG*0.75 && 
+      y >= mPositionY-Controller.SIZE_IMG*1.25 &&
+      isExtended) { return true;
+      }else return false;
+  }
+  
+  boolean containsAmpPatchIn(int x, int y){
+    if(x <= mPositionX-Controller.SIZE_IMG*1.25 && 
+      x >= mPositionX-Controller.SIZE_IMG*1.75 &&
+      y <= mPositionY-Controller.SIZE_IMG*0.75 && 
+      y >= mPositionY-Controller.SIZE_IMG*1.25 &&
+      isExtended) { println("hit AmpPatchIn");
         return true;
-      }
-      else return false;
+      }else return false;
   }
     
   boolean containsFreqSelect(int x, int y){
-    if(x <= mPositionX-(Controller.SIZE_IMG/2)-(Controller.SIZE_IMG/4) && 
-      x >= mPositionX-(Controller.SIZE_IMG+Controller.SIZE_IMG/2)-(Controller.SIZE_IMG/4) &&
-      y <= mPositionY+(Controller.SIZE_IMG/4) && 
-      y >= mPositionY-(Controller.SIZE_IMG/4) &&
-      isExtended) {
-        println("hit freq");
+    if(x <= mPositionX-(Controller.SIZE_IMG*0.75) && 
+      x >= mPositionX-(Controller.SIZE_IMG*1.75) &&
+      y <= mPositionY+(Controller.SIZE_IMG*0.25) && 
+      y >= mPositionY-(Controller.SIZE_IMG*0.25) &&
+      isExtended) { return true;
+      }else return false;
+  }
+  
+  boolean containsFreqPatchIn(int x, int y){
+    if(x <= mPositionX-(Controller.SIZE_IMG*1.25) && 
+      x >= mPositionX-(Controller.SIZE_IMG*2.25) &&
+      y <= mPositionY+(Controller.SIZE_IMG*0.25) && 
+      y >= mPositionY-(Controller.SIZE_IMG*0.25) &&
+      isExtended) { println("hit FreqPatchIn");
         return true;
-      }
-      else return false;
+      }else return false;
+  }
+  
+  boolean containsPatchOut(int x, int y){
+    if(x <= mPositionX+(Controller.SIZE_IMG*1.75) && 
+      x >= mPositionX+(Controller.SIZE_IMG*0.75) &&
+      y <= mPositionY+(Controller.SIZE_IMG*0.25) && 
+      y >= mPositionY-(Controller.SIZE_IMG*0.25) &&
+      isExtended) { println("hit PatchOut");
+        return true;
+      }else return false;
+  }
+  
+  boolean containsRemove(int x, int y){
+    if(x <= mPositionX+(Controller.SIZE_IMG*0.75)+(Controller.SIZE_IMG/4) && 
+      x >= mPositionX+(Controller.SIZE_IMG*0.75)-(Controller.SIZE_IMG/4) &&
+      y <= mPositionY-Controller.SIZE_IMG+(Controller.SIZE_IMG/4) && 
+      y >= mPositionY-Controller.SIZE_IMG-(Controller.SIZE_IMG/4) &&
+      isExtended) { return true;
+      }else return false;
   }
   
   void rotateTo(int x, int y){
@@ -104,6 +145,7 @@ class Poti extends Controller{
     else if(s.equalsIgnoreCase(Controller.TYPE_FREQ)) mRotation = radians(((WaveGen)mSoundObject).getFrequency()/(Controller.MAX_FREQUENCY/360));
   }
   void toggleExtensions(){ isExtended = !isExtended; }
+  boolean isMenuOpen(){ return isExtended; }
   
   SoundObject getSoundObject(){ return mSoundObject; }
   

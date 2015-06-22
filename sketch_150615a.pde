@@ -7,7 +7,7 @@ import ddf.minim.effects.*;
 
 Minim minim;
 AudioOutput out;
-Poti[] controllerArray;
+ArrayList<Poti> controllerArray;
 int outScale = 1;
 
 void setup(){  //noLoop();
@@ -15,7 +15,8 @@ void setup(){  //noLoop();
   
   minim = new Minim(this);
   out = minim.getLineOut();
-  controllerArray = new Poti[]{new Poti(100, 100, new WaveGen(out))};
+  controllerArray = new ArrayList<Poti>();
+  controllerArray.add(new Poti(100, 100, new WaveGen(out)));
 }
   
 
@@ -38,6 +39,11 @@ void drawMenu(){
   translate(50, 25);
   image(loadImage("wave.png"), 0, 0, 25, 25);
   popMatrix(); 
+  pushMatrix();
+  translate(getWidth()/2,100);
+  image(loadImage("patchIn.png"), 0, 0, 50, 50);
+  popMatrix(); 
+  
 }
 
 void drawOutWave(int sizeValue){
@@ -61,21 +67,35 @@ void drawOutWave(int sizeValue){
 void mousePressed(){
   
 }
+
+void mouseReleased(){
+
+}
 void mouseClicked(){
   checkMenuItemClick(mouseX, mouseY);
   for(Poti controller : controllerArray){
-    if(controller.containsMenu(mouseX, mouseY)){
+    controller.containsFreqPatchIn(mouseX, mouseY);
+    controller.containsAmpPatchIn(mouseX, mouseY);
+    controller.containsPatchOut(mouseX, mouseY);
+    if(controller.containsRemove(mouseX, mouseY)){
+      controllerArray.remove(controller);
+      return;
+    }else if(controller.containsMenu(mouseX, mouseY)){
       controller.toggleExtensions();
+      return;
     }else if(controller.containsAmpSelect(mouseX, mouseY)){
       controller.setType(Controller.TYPE_AMP);
+      return;
     }else if (controller.containsFreqSelect(mouseX, mouseY)){
       controller.setType(Controller.TYPE_FREQ);
+      return;
     }else if(controller.contains(mouseX, mouseY)){
       if(mouseButton==LEFT){
         controller.switchTypes();
       }else if(mouseButton == RIGHT){
         controller.toggleExtensions();
       }
+      return;
     }
   }
 }
@@ -85,17 +105,18 @@ void checkMenuItemClick(int x, int y){
     if(x <= 50+25/2 && 
       x >= 50-25/2 &&
       y <= 25+25/2 && y >= 25-25/2)
-      controllerArray = (Poti[])append(controllerArray, new Poti(100, 100, new WaveGen(out)));
+      controllerArray.add(new Poti(100, 100, new WaveGen(out)));
 }
 
 void mouseDragged(){
   for(Poti controller : controllerArray){
     if(controller.contains(mouseX, mouseY)){        
-      if(mouseButton==LEFT){
+      if(controller.isExtended){
         controller.rotateTo(mouseX, mouseY);
-      }else if(mouseButton==RIGHT){
+      }else if(!controller.isExtended){
         controller.move(mouseX, mouseY);
       }
+      return;
     }
   }
 }
